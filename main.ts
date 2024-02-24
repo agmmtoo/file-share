@@ -15,7 +15,7 @@ import {
   AWS_REGION,
   AWS_ACCESS_KEY_ID,
   AWS_SECRET_ACCESS_KEY,
-  AWS_BUCKET_NAME,
+  AWS_S3_BUCKET_NAME,
   APP_URL,
 } from "./config.ts";
 import { expireMap } from "./utils.ts";
@@ -107,14 +107,14 @@ app.post("/upload", async (c) => {
   });
 
   const putObjectCommand = new PutObjectCommand({
-    Bucket: AWS_BUCKET_NAME,
+    Bucket: AWS_S3_BUCKET_NAME,
     Key: id.toString(),
     Body: await file.arrayBuffer(),
     ContentType: file.type,
   });
 
   const getObjectCommand = new GetObjectCommand({
-    Bucket: AWS_BUCKET_NAME,
+    Bucket: AWS_S3_BUCKET_NAME,
     Key: id.toString(),
   });
 
