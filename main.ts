@@ -116,11 +116,13 @@ app.post("/upload", async (c) => {
     Key: id.toString(),
   });
 
-  const _s3PutResult = await s3Client.send(putObjectCommand);
+  const s3PutResult = await s3Client.send(putObjectCommand);
+  console.log("uploaded: ", id, s3PutResult.$metadata.requestId);
   // generate s3 presigned url
   const presignedUrl = await getSignedUrl(s3Client, getObjectCommand, {
     expiresIn: expireMap[expireKey] / 1_000,
   });
+  console.log("presignedUrl: ", presignedUrl);
 
   await kv.set([STORE_KEY, id.toString()], {
     id,
@@ -130,6 +132,7 @@ app.post("/upload", async (c) => {
     created,
     expire,
   });
+  console.log("saved to kv: ", STORE_KEY, id);
 
   return c.redirect(`/download/${id.toString()}`);
 });
