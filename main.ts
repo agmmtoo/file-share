@@ -10,8 +10,6 @@ import { getSignedUrl } from "npm:@aws-sdk/s3-request-presigner";
 
 import {
   PORT,
-  HTML_INDEX,
-  HTML_DOWNLOAD,
   AWS_REGION,
   AWS_ACCESS_KEY_ID,
   AWS_SECRET_ACCESS_KEY,
@@ -26,7 +24,7 @@ import type { Item } from "./types.ts";
 
 const app = new Hono();
 
-app.get("/", (c) => c.html(Deno.readTextFile(HTML_INDEX)));
+app.get("/", (c) => c.html(Deno.readTextFile("index.html")));
 
 app.get("/download/:id", async (c) => {
   const id = c.req.param("id");
@@ -43,7 +41,7 @@ app.get("/download/:id", async (c) => {
   // const base64Image = await qrcode(String(item.value.url));
   const base64Image = await qrcode(`${APP_URL}/f/${id}`);
 
-  const downloadPageTmpl = await Deno.readTextFile(HTML_DOWNLOAD);
+  const downloadPageTmpl = await Deno.readTextFile("download.html");
   // match {{ key }} in the template
   const templateRE = /\{\{\s([a-zA-Z_$][0-9a-zA-Z_$]*)\s\}\}/g;
 
