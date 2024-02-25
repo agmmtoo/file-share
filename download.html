@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Minimalist file sharing app.">
+    <meta name="author" content="agmmtoo">
+    <meta name="theme-color" content="#ffffff">
     <title>{{ filename }}</title>
     <style>
         /* reset */
@@ -28,7 +31,7 @@
             }
 
             img.qrcode {
-                width: 70%;
+                width: 100%;
                 aspect-ratio: 1/1;
             }
 
@@ -44,6 +47,11 @@
                 margin-block: 1rem;
             }
         }
+
+        span.footer {
+            color: #333;
+            text-align: center;
+        }
     </style>
 </head>
 
@@ -51,9 +59,9 @@
     <main>
         <section>
             <figure>
-                <img class="qrcode" src="{{ qrcode }}" alt="image" />
+                <img class="qrcode" src="{{ qrcode }}" alt="{{ filename }}" />
                 <figcaption>{{ filename }}</figcaption>
-                <textarea readonly>{{ comment }}</textarea>
+                <!-- <textarea readonly>{{ comment }}</textarea> -->
             </figure>
         </section>
         <section>
@@ -63,6 +71,8 @@
             <a href="{{ url }}" download="{{ filename }}" class="download">Download</a>
             <button id="share-button">Share</button>
         </section>
+
+        <span class="footer">Made with 🩶 by <a href="https://github.com/agmmtoo">agmmtoo</a>.</span>
     </main>
     <script defer>
 
