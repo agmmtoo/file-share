@@ -1,5 +1,9 @@
 import { Hono } from "https://deno.land/x/hono@v4.0.5/mod.ts";
 import { qrcode } from "https://deno.land/x/qrcode@v2.0.0/mod.ts";
+import {
+  StatusCodes,
+
+} from "https://deno.land/x/http_status@v1.0.1/mod.ts";
 
 import {
   S3Client,
@@ -88,6 +92,11 @@ app.post("/upload", async (c) => {
 
   const expireKey = form.get("expire") as string;
   const file = form.get("file") as File;
+
+  if (file.size > 10 * 1024 * 1024) {
+    c.status(StatusCodes.BAD_REQUEST);
+    return c.text("File size too large! (max 10MB)");
+  }
 
   const min = 100_000; // Minimum 6-digit number
   const max = 999_999; // Maximum 6-digit number

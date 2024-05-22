@@ -3,7 +3,8 @@
   "packages": {
     "specifiers": {
       "npm:@aws-sdk/client-s3": "npm:@aws-sdk/client-s3@3.521.0_@aws-sdk+credential-provider-node@3.521.0",
-      "npm:@aws-sdk/s3-request-presigner": "npm:@aws-sdk/s3-request-presigner@3.521.0"
+      "npm:@aws-sdk/s3-request-presigner": "npm:@aws-sdk/s3-request-presigner@3.521.0",
+      "npm:@types/node": "npm:@types/node@18.16.19"
     },
     "npm": {
       "@aws-crypto/crc32@3.0.0": {
@@ -1018,6 +1019,10 @@
           "tslib": "tslib@2.6.2"
         }
       },
+      "@types/node@18.16.19": {
+        "integrity": "sha512-IXl7o+R9iti9eBW4Wg2hx1xQDig183jj7YLn8F7udNceyfkbn1ZxmzZXuak20gR40D7pIkIY1kYGx5VIGbaHKA==",
+        "dependencies": {}
+      },
       "bowser@2.11.0": {
         "integrity": "sha512-AlcaJBi/pqqJBIQ8U9Mcpc9i8Aqxn88Skv5d+xBX006BY5u8N3mGLHa5Lgppa7L/HfwgwLgZ6NYs+Ag6uUmJRA==",
         "dependencies": {}
@@ -1049,6 +1054,8 @@
   "redirects": {
     "https://deno.land/x/hono/middleware.ts": "https://deno.land/x/hono@v4.0.5/middleware.ts",
     "https://deno.land/x/hono/mod.ts": "https://deno.land/x/hono@v4.0.5/mod.ts",
+    "https://deno.land/x/http_status": "https://deno.land/x/http_status@v1.0.1",
+    "https://deno.land/x/http_status/mod.ts": "https://deno.land/x/http_status@v1.0.1/mod.ts",
     "https://deno.land/x/qrcode/mod.ts": "https://deno.land/x/qrcode@v2.0.0/mod.ts",
     "https://deno.land/x/s3/mod.ts": "https://deno.land/x/s3@0.5.0/mod.ts"
   },
@@ -1089,6 +1096,8 @@
     "https://deno.land/x/hono@v4.0.5/utils/url.ts": "d9d307a495e7dfc6e916fbcfa74c2d8d23e8e685bddc5e6ebc9c0f784345a01a",
     "https://deno.land/x/hono@v4.0.5/validator/index.ts": "6c986e8b91dcf857ecc8164a506ae8eea8665792a4ff7215471df669c632ae7c",
     "https://deno.land/x/hono@v4.0.5/validator/validator.ts": "d80db93f84bce6406feac5d157cb97ee69242498d0dbec4568cb5df1a844bf0f",
+    "https://deno.land/x/http_status@v1.0.1/mod.ts": "2292bbc2453fa2a4f9f306b9272c30c55e5a733f84f99034f649903a715ba541",
+    "https://deno.land/x/http_status@v1.0.1/src/http_status_codes.ts": "0196536ff25a7356f9fe492d4c413c7b9a1d8996c6ea8e2755af4901ad5655ac",
     "https://deno.land/x/qrcode@v2.0.0/mod.ts": "3e693e8190d5fb4c6ab68a14a1a9473c325d5244fd83240b49cdecdf5fc18a1b",
     "https://deno.land/x/qrcode@v2.0.0/qrcode.js": "138f870978e21843f48d8b0855b69de6ebf430c3ab9f57c3fa2746d6fba45bf1"
   }

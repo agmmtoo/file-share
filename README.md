@@ -35,7 +35,7 @@ tl;dr: Upload file, get link, share link.
 - [x] Basic features
 - [ ] Write README
 - [ ] Add file expiration
-- [ ] Add file size limit
+- [x] Add file size limit
 - [ ] Add file type limit
 - [ ] Add file download limit
 - [ ] Add file download count limit
