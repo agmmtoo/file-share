@@ -1,9 +1,6 @@
-import { Hono } from "https://deno.land/x/hono@v4.0.5/mod.ts";
-import { qrcode } from "https://deno.land/x/qrcode@v2.0.0/mod.ts";
-import {
-  StatusCodes,
-
-} from "https://deno.land/x/http_status@v1.0.1/mod.ts";
+import { Hono } from "@hono/hono";
+import { qrcode } from "@libs/qrcode";
+import { STATUS_CODE, STATUS_TEXT } from "@std/http";
 
 import {
   S3Client,
@@ -42,15 +39,15 @@ app.get("/download/:id", async (c) => {
     return c.text("Gone");
   }
 
-  // const base64Image = await qrcode(String(item.value.url));
-  const base64Image = await qrcode(`${APP_URL}/f/${id}`);
+  const svg = qrcode(`${APP_URL}/f/${id}`, { output: "svg" });
+  // const svg = qrcode(item.value.url, { output: "svg" });
 
   const downloadPageTmpl = await Deno.readTextFile("download.html");
   // match {{ key }} in the template
   const templateRE = /\{\{\s([a-zA-Z_$][0-9a-zA-Z_$]*)\s\}\}/g;
 
   const tmplVars: Record<string, string> = {
-    qrcode: String(base64Image),
+    qrcode: svg,
     filename: item.value.name,
     url: item.value.url,
     expire: item.value.expire.toString(),
@@ -74,8 +71,8 @@ app.get("/f/:id", async (c) => {
   }
 
   if (item.value.expire < new Date().getTime()) {
-    c.status(410);
-    return c.text("Gone");
+    c.status(STATUS_CODE.Gone);
+    return c.text(STATUS_TEXT[STATUS_CODE.Gone]);
   }
 
   return c.redirect(item.value.url);
@@ -85,8 +82,8 @@ app.post("/upload", async (c) => {
   const form = await c.req.formData();
   for (const [_key, value] of form.entries()) {
     if (!value) {
-      c.status(422);
-      return c.text("UnprocessableEntity");
+      c.status(STATUS_CODE.UnprocessableEntity);
+      return c.text(STATUS_TEXT[STATUS_CODE.UnprocessableEntity]);
     }
   }
 
@@ -94,7 +91,7 @@ app.post("/upload", async (c) => {
   const file = form.get("file") as File;
 
   if (file.size > 10 * 1024 * 1024) {
-    c.status(StatusCodes.BAD_REQUEST);
+    c.status(STATUS_CODE.BadRequest);
     return c.text("File size too large! (max 10MB)");
   }
 
@@ -116,6 +113,7 @@ app.post("/upload", async (c) => {
   const putObjectCommand = new PutObjectCommand({
     Bucket: AWS_S3_BUCKET_NAME,
     Key: id.toString(),
+    // @ts-ignore: find way to get arrayBuffer from file
     Body: await file.arrayBuffer(),
     ContentType: file.type,
   });

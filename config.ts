@@ -1,6 +1,4 @@
-import { load } from "https://deno.land/std@0.217.0/dotenv/mod.ts";
-
-await load();
+import "jsr:@std/dotenv/load";
 
 export const PORT = Number(Deno.env.get("PORT")) ?? 3000;
 
