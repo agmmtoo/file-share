@@ -1,31 +1,47 @@
-import { Hono } from "@hono/hono";
+import { Hono } from "hono";
 import { qrcode } from "@libs/qrcode";
+import { serveStatic } from "hono/deno";
+import { logger } from "hono/logger";
+import { zValidator } from "@hono/zod-validator";
+import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
 import { STATUS_CODE, STATUS_TEXT } from "@std/http";
 
 import {
-  S3Client,
-  PutObjectCommand,
   GetObjectCommand,
+  PutObjectCommand,
+  S3Client,
 } from "npm:@aws-sdk/client-s3";
 import { getSignedUrl } from "npm:@aws-sdk/s3-request-presigner";
 
 import {
-  PORT,
-  AWS_REGION,
-  AWS_ACCESS_KEY_ID,
-  AWS_SECRET_ACCESS_KEY,
-  AWS_S3_BUCKET_NAME,
   APP_URL,
+  AWS_ACCESS_KEY_ID,
+  AWS_REGION,
+  AWS_S3_BUCKET_NAME,
+  AWS_SECRET_ACCESS_KEY,
+  PORT,
 } from "./config.ts";
 import { expireMap } from "./utils.ts";
 import { STORE_KEY } from "./db.ts";
 import { kv } from "./db.ts";
 
 import type { Item } from "./types.ts";
+import { Upload } from "./components/Upload.tsx";
+import { getKey } from "./utils/generateId.ts";
+import { createPresignedUrl, getPresignedUrl } from "./utils/AWSS3.ts";
 
 const app = new Hono();
 
-app.get("/", (c) => c.html(Deno.readTextFile("index.html")));
+app.use(logger());
+
+app.get("/", (c) => c.html(<Upload />));
+app.use(
+  "/static/*",
+  serveStatic({
+    root: ".",
+    rewriteRequestPath: (path) => path.replace(/^\/static/, "/assets"),
+  })
+);
 
 app.get("/download/:id", async (c) => {
   const id = c.req.param("id");
@@ -143,5 +159,47 @@ app.post("/upload", async (c) => {
 
   return c.redirect(`/download/${id.toString()}`);
 });
+
+app.post(
+  "/api/upload",
+  zValidator(
+    "json",
+    z.object({ expire: z.string(), name: z.string(), size: z.number() })
+  ),
+  async (c) => {
+    const v = c.req.valid("json");
+
+    if (v.size > 10 * 1024 * 1024) {
+      c.status(STATUS_CODE.BadRequest);
+      return c.text("File size too large! (max 10MB)");
+    }
+
+    const key = getKey();
+    const created = new Date().getTime();
+    const expire = created + expireMap[v.expire];
+
+    const url = await createPresignedUrl(key.toString());
+
+    const purl = await getPresignedUrl(
+      key.toString(),
+      expireMap[v.expire] / 1_000
+    );
+
+    await kv.set([STORE_KEY, key.toString()], {
+      key,
+      name: v.name,
+      size: v.size,
+      url: purl,
+      created,
+      expire,
+    });
+    console.log("saved to kv: ", STORE_KEY, key);
+
+    const redirect = `/download/${key.toString()}`;
+    console.log("storing: ", v);
+
+    return c.json({ url, redirect });
+  }
+);
 
 Deno.serve({ port: PORT }, app.fetch);

@@ -1,103 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Minimalist file sharing app.">
-    <meta name="author" content="agmmtoo">
-    <meta name="theme-color" content="#ffffff">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Minimalist file sharing app." />
+    <meta name="author" content="agmmtoo" />
+    <meta name="theme-color" content="#ffffff" />
     <title>{{ filename }}</title>
     <style>
-        /* reset */
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100vw;
-            height: 100vh;
+      /* reset */
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100vw;
+        height: 100vh;
+      }
+
+      main {
+        height: 100%;
+        display: grid;
+        place-items: center;
+      }
+
+      figure {
+        figcaption {
+          text-align: center;
         }
 
-        main {
-            height: 100%;
-            display: grid;
-            place-items: center;
+        img.qrcode {
+          width: 100%;
+          aspect-ratio: 1/1;
         }
 
-        figure {
-
-            figcaption {
-                text-align: center;
-            }
-
-            img.qrcode {
-                width: 100%;
-                aspect-ratio: 1/1;
-            }
-
-            @media screen and (min-width: 768px) {
-                img.qrcode {
-                    width: 20rem;
-                }
-            }
-
-            textarea {
-                width: 100%;
-                resize: vertical;
-                margin-block: 1rem;
-            }
+        @media screen and (min-width: 768px) {
+          img.qrcode {
+            width: 20rem;
+          }
         }
 
-        span.footer {
-            color: #333;
-            text-align: center;
+        textarea {
+          width: 100%;
+          resize: vertical;
+          margin-block: 1rem;
         }
+      }
+
+      span.footer {
+        color: #333;
+        text-align: center;
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <main>
-        <section>
-            <figure>
-                {{ qrcode }}
-                <!-- <img class="qrcode" src="{{ qrcode }}" alt="{{ filename }}" /> -->
-                <figcaption>{{ filename }}</figcaption>
-                <!-- <textarea readonly>{{ comment }}</textarea> -->
-            </figure>
-        </section>
-        <section>
-            <span>Expires in: </span><time data-expire="{{ expire }}" id="expire" datetime="{{ expire }}"></time>
-        </section>
-        <section>
-            <a href="{{ url }}" download="{{ filename }}" class="download">Download</a>
-            <button id="share-button">Share</button>
-        </section>
+      <section>
+        <figure>
+          {{ qrcode }}
+          <!-- <img class="qrcode" src="{{ qrcode }}" alt="{{ filename }}" /> -->
+          <figcaption>{{ filename }}</figcaption>
+          <!-- <textarea readonly>{{ comment }}</textarea> -->
+        </figure>
+      </section>
+      <section>
+        <span>Expires in: </span>
+        <time
+          data-expire="{{ expire }}"
+          id="expire"
+          datetime="{{ expire }}"
+        ></time>
+      </section>
+      <section>
+        <a href="{{ url }}" download="{{ filename }}" class="download"
+        >Download</a>
+        <button id="share-button">Share</button>
+      </section>
 
-        <span class="footer">Made with 🩶 by <a href="https://github.com/agmmtoo">agmmtoo</a>.</span>
+      <span class="footer"
+      >Made with 🩶 by <a href="https://github.com/agmmtoo">agmmtoo</a>.</span>
     </main>
     <script defer>
+      if (navigator.share) {
+        const shareButton = document.querySelector("#share-button");
 
-        if (navigator.share) {
-            const shareButton = document.querySelector('#share-button');
-
-            shareButton.addEventListener('click', async () => {
-                try {
-                    await navigator.share({
-                        title: document.title,
-                        url: window.location.href
-                    });
-                    console.log('Page shared successfully');
-                } catch (error) {
-                    console.error('Error sharing:', error.message);
-                }
+        shareButton.addEventListener("click", async () => {
+          try {
+            await navigator.share({
+              title: document.title,
+              url: window.location.href,
             });
-        } else {
-            console.log('Web Share API not supported');
-        }
+            console.log("Page shared successfully");
+          } catch (error) {
+            console.error("Error sharing:", error.message);
+          }
+        });
+      } else {
+        console.log("Web Share API not supported");
+      }
 
-        const expireElem = document.getElementById('expire');
-        expireElem.textContent = new Date(Number(expireElem.dataset.expire)).toLocaleString();
+      const expireElem = document.getElementById("expire");
+      expireElem.textContent = new Date(Number(expireElem.dataset.expire))
+        .toLocaleString();
     </script>
-</body>
-
+  </body>
 </html>

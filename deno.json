@@ -1,11 +1,16 @@
 {
   "tasks": {
-    "start": "deno run --allow-sys --unstable-kv --allow-net --allow-env --allow-read main.ts",
-    "dev": "deno run --watch --allow-sys --unstable-kv --allow-net --allow-env --allow-read main.ts"
+    "start": "deno run --allow-sys --unstable-kv --allow-net --allow-env --allow-read main.tsx",
+    "dev": "deno run --watch --allow-sys --unstable-kv --allow-net --allow-env --allow-read main.tsx"
   },
   "imports": {
-    "@hono/hono": "jsr:@hono/hono@^4.6.9",
+    "@hono/zod-validator": "npm:@hono/zod-validator@^0.4.1",
+    "hono": "jsr:@hono/hono@^4.6.9",
     "@libs/qrcode": "jsr:@libs/qrcode@^2.0.0",
     "@std/http": "jsr:@std/http@^1.0.9"
+  },
+  "compilerOptions": {
+    "jsx": "precompile",
+    "jsxImportSource": "hono/jsx"
   }
 }
