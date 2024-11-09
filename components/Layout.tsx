@@ -9,15 +9,15 @@ export const Layout: FC = (props) => {
         <meta name="description" content="Minimalist file sharing app." />
         <meta name="author" content="agmmtoo" />
         <meta name="theme-color" content="#ffffff" />
-        <title>File Share</title>
+        <title>{props.title ? `${props.title} | ` : ""}File Share</title>
         <link rel="stylesheet" href="/static/style.css" />
       </head>
 
       <body>
-        <main>
-          <section class="upload">{props.children}</section>
-        </main>
-        <script></script>
+        <main>{props.children}</main>
+        <footer class="footer">
+          Made with 🩶 by <a href="https://github.com/agmmtoo">agmmtoo</a>.
+        </footer>
       </body>
     </html>
   );

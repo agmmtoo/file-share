@@ -8,7 +8,7 @@ formElem.addEventListener("submit", async function onsubmit(e) {
   const req = await fetch("/api/upload", {
     method: "POST",
     body: JSON.stringify({
-      expire: formData.get("expire"),
+      expire: Number(formData.get("expire")),
       name: file.name,
       size: file.size,
     }),
@@ -16,6 +16,11 @@ formElem.addEventListener("submit", async function onsubmit(e) {
       "Content-Type": "application/json",
     },
   });
+
+  if (!req.ok) {
+    alert(JSON.stringify(await req.json()));
+    return;
+  }
 
   const { url, redirect } = await req.json();
 

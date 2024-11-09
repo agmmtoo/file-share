@@ -4,12 +4,20 @@ body {
   padding: 0;
   width: 100vw;
   height: 100vh;
+  height: 100%;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  place-items: center;
+
+  accent-color: rgb(var(--color-theme));
+}
+
+:root {
+  --color-theme: 135, 132, 192; /* RGB values of #8ba730 */;
 }
 
 main {
-  height: 100%;
-  display: grid;
-  place-items: center;
+  max-width: 100%;
 }
 
 form#form {
@@ -29,4 +37,41 @@ form#form {
 
 div#download {
   width: 20rem;
+}
+
+footer.footer {
+  text-align: center;
+}
+
+figure {
+  svg {
+    box-shadow: rgba(var(--color-theme), 0.5) 0px 20px 30px;
+    border: 1px solid rgb(var(--color-theme));
+    border-radius: 0.5rem;
+    width: 100%;
+    aspect-ratio: 1/1;
+  }
+
+  figcaption {
+    margin-top: 2rem;
+    text-align: center;
+    font-weight: 500;
+    font-size: small;
+  }
+
+  .svg-container {
+    width: 100%;
+  }
+
+  @media screen and (min-width: 768px) {
+    svg {
+      width: 20rem;
+    }
+  }
+
+  textarea {
+    width: 100%;
+    resize: vertical;
+    margin-block: 1rem;
+  }
 }

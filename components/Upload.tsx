@@ -1,35 +1,66 @@
-import { getKey } from "../utils/generateId.ts";
-import { createPresignedUrl } from "../utils/AWSS3.ts";
 import { Layout } from "./Layout.tsx";
+import { useState } from "hono/jsx";
+import { render } from "hono/jsx/dom";
+
+const options = [
+  {
+    id: "minute",
+    value: 60000,
+    text: "1 Minute",
+  },
+  {
+    id: "hour",
+    value: 3600000,
+    text: "1 Hour",
+  },
+  {
+    id: "day",
+    value: 86400000,
+    text: "1 Day",
+  },
+];
 
 export const Upload = async () => {
   return (
     <Layout>
-      <script src="/static/upload.js" type="module" defer></script>
-      <form
-        id="form"
-        action="/upload"
-        method="post"
-        enctype="multipart/form-data"
-      >
-        <input type="file" name="file" required />
-        <fieldset>
-          <legend>Expire</legend>
-          <input type="radio" id="minute" name="expire" value="m" checked />
-          <label for="minute">1 Minute</label>
-
-          <input type="radio" id="hour" name="expire" value="h" />
-          <label for="hour">1 Hour</label>
-
-          <input type="radio" id="day" name="expire" value="d" />
-          <label for="day">1 Day</label>
-        </fieldset>
-        <button type="submit">Upload</button>
-        {/* <!-- <progress id="progress" value="0" max="100"></progress> --> */}
-        <span class="footer">
-          Made with 🩶 by <a href="https://github.com/agmmtoo">agmmtoo</a>.
-        </span>
-      </form>
+      <section class="upload">
+        <script src="/static/upload.js" type="module" defer></script>
+        <form
+          id="form"
+          action="/upload"
+          method="post"
+          enctype="multipart/form-data"
+        >
+          <input type="file" name="file" required />
+          <fieldset>
+            <legend>Expire</legend>
+            {options.map(({ id, value, text }, idx) => (
+              <>
+                <input
+                  type="radio"
+                  id={id}
+                  name="expire"
+                  value={value}
+                  checked={!idx}
+                />
+                <label for={id}>{text}</label>
+              </>
+            ))}
+          </fieldset>
+          <button type="submit">Upload</button>
+          {/* <!-- <progress id="progress" value="0" max="100"></progress> --> */}
+        </form>
+      </section>
     </Layout>
   );
 };
+
+function Counter() {
+  const [count, setCount] = useState(0);
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(count + 1)}>Increment</button>
+    </div>
+  );
+}
