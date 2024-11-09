@@ -43,3 +43,19 @@ tl;dr: Upload file, get link, share link.
 - [ ] Add file encryption
 - [ ] Add file compression
 - [ ] Add file comments
+
+## Note
+
+S3 Bucket > Permissions > CORS configuration
+
+```json
+[
+  {
+    "AllowedHeaders": ["*"],
+    "AllowedMethods": ["PUT"],
+    "AllowedOrigins": ["https://file-share.deno.dev"],
+    "ExposeHeaders": ["ETag"],
+    "MaxAgeSeconds": 3000
+  }
+]
+```
