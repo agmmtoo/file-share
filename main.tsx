@@ -106,7 +106,7 @@ app.post(
 
     const putURL = await createPresignedUrl(key.toString());
 
-    const getURL = await getPresignedUrl(key.toString(), v.expire);
+    const getURL = await getPresignedUrl(key.toString(), v.expire / 1000);
 
     await kv.set([STORE_KEY, key.toString()], {
       key,
@@ -117,7 +117,7 @@ app.post(
       expire: expireAt,
     });
 
-    console.log("saved to kv: ", STORE_KEY, key);
+    console.log("saved to kv: ", STORE_KEY, key, expireAt);
 
     const redirect = `/download/${key.toString()}`;
 

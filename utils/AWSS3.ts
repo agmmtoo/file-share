@@ -21,7 +21,7 @@ export const createPresignedUrl = (key: string) => {
     Key: key,
   });
 
-  return getSignedUrl(client, command, { expiresIn: 3600 });
+  return getSignedUrl(client, command, { expiresIn: 300 });
 };
 
 export const getPresignedUrl = async (key: string, expiresIn: number) => {
@@ -37,7 +37,6 @@ export const getPresignedUrl = async (key: string, expiresIn: number) => {
       secretAccessKey: AWS_SECRET_ACCESS_KEY,
     },
   });
-  console.log(expiresIn)
 
   // generate s3 presigned url
   const presignedUrl = await getSignedUrl(s3Client, getObjectCommand, {
