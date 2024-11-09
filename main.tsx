@@ -33,17 +33,8 @@ app.use(
 
 app.get("/download/:id", async (c) => {
   const id = c.req.param("id");
-  // const item = await kv.get<Item>([STORE_KEY, id]);
-
-  const item = {};
-  item.value = {
-    key: 976733,
-    name: "thinking-101.txt",
-    size: 1996,
-    url: "https://encrypted-sharing.s3.ap-southeast-1.amazonaws.com/976733?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIATCKATEPHPNWPHJUS%2F20241109%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20241109T134423Z&X-Amz-Expires=NaN&X-Amz-Signature=1e805348aacc81c8440405fa9f967d94a40a6ed0c372ec6c7bfe142d819ad790&X-Amz-SignedHeaders=host&x-id=GetObject",
-    created: 1731159863083,
-    expire: 1731163463083,
-  };
+  const item = await kv.get<Item>([STORE_KEY, id]);
+  
   if (!item.value) {
     return c.html(<NotFound />);
   }
