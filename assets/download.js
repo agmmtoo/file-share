@@ -7,14 +7,17 @@ share.addEventListener("click", () => {
     if (navigator.share) {
         const shareButton = document.querySelector("#share-button");
 
-        shareButton.addEventListener("click", async () => {
+        shareButton.addEventListener("click", async function() {
             try {
+                this.disabled = true;
                 await navigator.share({
                     title: document.title,
                     url: window.location.href,
                 });
             } catch (error) {
                 console.error("Error sharing:", error.message);
+            } finally {
+                this.disabled = false;
             }
         });
     } else {
@@ -29,8 +32,10 @@ copy.addEventListener("click", async function () {
     }
     await navigator.clipboard.writeText(this.dataset.link)
     this.innerText = "Copied!";
+    this.disabled = true;
     setTimeout(() => {
         this.innerText = "Copy Link";
+        this.disabled = false;
     }, 2e3);
 });
 

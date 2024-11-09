@@ -5,7 +5,7 @@ export const NotFound = async () => {
     <Layout title="404">
       <div style="text-align: center;">
         <h4>404</h4>
-        <p>It's just... I don't know anymore.</p>
+        <p>It's just... I kinda don't know.</p>
       </div>
     </Layout>
   );

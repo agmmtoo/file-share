@@ -8,7 +8,7 @@ export const Layout: FC = (props) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="description" content="Minimalist file sharing app." />
         <meta name="author" content="agmmtoo" />
-        <meta name="theme-color" content="#ffffff" />
+        <meta name="theme-color" content="#8784c0" />
         <title>{props.title ? `${props.title} | ` : ""}File Share</title>
         <link rel="stylesheet" href="/static/style.css" />
       </head>

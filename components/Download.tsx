@@ -28,7 +28,9 @@ export const Download: FC<{ qrcode: string; item: Item }> = async ({
       </section>
       <section style="text-align: center; display: flex; justify-content: space-evenly;">
         <a href={item.url} download={item.name} class="download">
+          <button>
           Download
+          </button>
         </a>
         <button id="share-button">Share</button>
         <button id="copy-button" data-link={item.url}>

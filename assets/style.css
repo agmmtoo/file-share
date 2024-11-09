@@ -13,11 +13,19 @@ body {
 }
 
 :root {
-  --color-theme: 135, 132, 192; /* RGB values of #8ba730 */;
+  --color-theme: 135, 132, 192;
 }
 
 main {
-  max-width: 100%;
+  width: 80%;
+}
+
+@media screen and (min-width: 40rem) {
+  main {
+    width: 32rem;
+    margin: 0 auto;
+  }
+  
 }
 
 form#form {
@@ -32,6 +40,27 @@ form#form {
   span {
     color: #333;
     text-align: center;
+  }
+
+  fieldset {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+    border-radius: 0.5rem;
+
+    legend {
+      padding: 0.5rem;
+    }
+  }
+
+  @media screen and (min-width: 40rem) {
+    fieldset {
+      display: block;
+
+      legend {
+        padding: 0.2rem;
+      }
+    }
   }
 }
 
@@ -61,9 +90,11 @@ figure {
 
   .svg-container {
     width: 100%;
+    display: grid;
+    place-items: center;
   }
 
-  @media screen and (min-width: 768px) {
+  @media screen and (min-width: 40rem) {
     svg {
       width: 20rem;
     }
@@ -73,5 +104,24 @@ figure {
     width: 100%;
     resize: vertical;
     margin-block: 1rem;
+  }
+}
+
+button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.24rem;
+  background-color: rgb(var(--color-theme));
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: rgba(var(--color-theme), 0.9);
+  }
+
+  &:disabled {
+    background-color: rgba(var(--color-theme), 0.2);
+    cursor: not-allowed;
   }
 }

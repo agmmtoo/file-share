@@ -1,6 +1,4 @@
 import { Layout } from "./Layout.tsx";
-import { useState } from "hono/jsx";
-import { render } from "hono/jsx/dom";
 
 const options = [
   {
@@ -54,13 +52,3 @@ export const Upload = async () => {
     </Layout>
   );
 };
-
-function Counter() {
-  const [count, setCount] = useState(0);
-  return (
-    <div>
-      <p>Count: {count}</p>
-      <button onClick={() => setCount(count + 1)}>Increment</button>
-    </div>
-  );
-}
