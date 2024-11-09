@@ -48,16 +48,7 @@ app.use(
 
 app.get("/download/:id", async (c) => {
   const id = c.req.param("id");
-  // const item = await kv.get<Item>([STORE_KEY, id]);
-  const item = {};
-  item.value = {
-    key: 965734,
-    name: "Screenshot 2024-05-24 at 22.08.12.png",
-    size: 1011252,
-    url: "https://encrypted-sharing.s3.ap-southeast-1.amazonaws.com/965734?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIATCKATEPHPNWPHJUS%2F20241109%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20241109T083526Z&X-Amz-Expires=86400&X-Amz-Signature=64054b3839c9ef9b7bdb5978f3283f2cefdbfa420cddbaae19ee9ab85c0713a1&X-Amz-SignedHeaders=host&x-id=GetObject",
-    created: 1731141326582,
-    expire: 1731227726582,
-  };
+  const item = await kv.get<Item>([STORE_KEY, id]);
   if (!item.value) {
     return c.html(<NotFound />);
   }
