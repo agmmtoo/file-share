@@ -21,7 +21,7 @@ export const Download: FC<{ qrcode: string; item: Item }> = async ({
           {/* <!-- <textarea readonly>{{ comment }}</textarea> --> */}
         </figure>
       </section>
-      <section style="text-align: center; margin: 1rem auto; display: flex; gap: 1rem">
+      <section style="margin: 1rem auto; display: flex; justify-content: center; gap: 1rem">
         {item.encrypt ? <SVGShield /> : null}
         <span>Available until:</span>
         <time data-expire={item.expire} id="expire" datetime={item.expire}>
@@ -30,7 +30,7 @@ export const Download: FC<{ qrcode: string; item: Item }> = async ({
       </section>
       <section style="text-align: center; display: flex; justify-content: space-evenly;">
         <a
-          {...(item.encrypt && {
+          {...(!item.encrypt && {
             href: item.url,
             download: item.name,
           })}
