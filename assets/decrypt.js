@@ -5,6 +5,7 @@ async function decryptFile() {
 
     if (!keyFragment) {
         keyFragment = prompt("Enter the decryption key:");
+        window.location.hash = keyFragment;
     }
 
     try {

@@ -1,7 +1,6 @@
 const expire = document.getElementById("expire");
 const share = document.getElementById("share-button");
 const copy = document.getElementById("copy-button");
-const qr = document.querySelector("svg>path")
 
 share.addEventListener("click", () => {
     if (navigator.share) {
