@@ -30,7 +30,7 @@ formElem.addEventListener("submit", async function onsubmit(e) {
 
     const { url, redirect } = await req.json();
 
-    let encKey;
+    let encKey, objectKey;
     if (encrypt) {
       console.log("%cEncrypting file...", "color: cyan");
 
@@ -55,6 +55,7 @@ formElem.addEventListener("submit", async function onsubmit(e) {
       // Convert encrypted data to a Blob for uploading
       file = new Blob([encrypted]);
       console.log("%cFile encrypted successfully", "color: cyan", encKey, file);
+      objectKey = await window.crypto.subtle.exportKey("jwk", encKey);
     }
 
     // Upload file to the URL
@@ -63,7 +64,6 @@ formElem.addEventListener("submit", async function onsubmit(e) {
       body: file,
     });
 
-    const objectKey = await window.crypto.subtle.exportKey("jwk", encKey);
     console.log("File uploaded successfully");
     window.location.href = encrypt ? `${redirect}#${objectKey.k}` : redirect;
   } catch (error) {
