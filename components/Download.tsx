@@ -30,14 +30,17 @@ export const Download: FC<{ qrcode: string; item: Item }> = async ({
       </section>
       <section style="text-align: center; display: flex; justify-content: space-evenly;">
         <a href={item.url} download={item.name} class="download">
-          <button>Download</button>
+          <button id="download-button">Download</button>
         </a>
         <button id="share-button">Share</button>
-        <button id="copy-button" data-link={item.url}>
+        <button id="copy-button" data-name={item.name} data-link={item.url}>
           Copy Link
         </button>
       </section>
       <script src="/static/download.js" type="module" defer></script>
+      {item.encrypt && (
+        <script src="/static/decrypt.js" type="module" defer></script>
+      )}
     </Layout>
   );
 };

@@ -30,34 +30,42 @@ formElem.addEventListener("submit", async function onsubmit(e) {
 
     const { url, redirect } = await req.json();
 
-    let encKey
-
+    let encKey;
     if (encrypt) {
       console.log("%cEncrypting file...", "color: cyan");
-      // ENCRYPTION
-      // REF: https://plus.excalidraw.com/blog/end-to-end-encryption
-      const encKey = await window.crypto.subtle.generateKey(
+
+      // Generate encryption key
+      encKey = await window.crypto.subtle.generateKey(
         { name: "AES-GCM", length: 256 },
         true,
         ["encrypt", "decrypt"]
-      )
+      );
 
-      file = await window.crypto.subtle.encrypt(
-        { name: "AES-GCM", iv: window.crypto.getRandomValues(new Uint8Array(12)) },
+      // Convert file to ArrayBuffer
+      const arrayBuffer = await file.arrayBuffer();
+
+      // Encrypt the file
+      const iv = new Uint8Array(12);
+      const encrypted = await window.crypto.subtle.encrypt(
+        { name: "AES-GCM", iv },
         encKey,
-        file,
-      )
+        arrayBuffer
+      );
+
+      // Convert encrypted data to a Blob for uploading
+      file = new Blob([encrypted]);
       console.log("%cFile encrypted successfully", "color: cyan", encKey, file);
     }
 
-    // upload file to the url
+    // Upload file to the URL
     await fetch(url, {
       method: "PUT",
       body: file,
     });
 
+    const objectKey = await window.crypto.subtle.exportKey("jwk", encKey);
     console.log("File uploaded successfully");
-    window.location.href = encrypt ? `${redirect}#${encKey}` : redirect;
+    window.location.href = encrypt ? `${redirect}#${objectKey.k}` : redirect;
   } catch (error) {
     console.error(error);
     alert(JSON.stringify(error));

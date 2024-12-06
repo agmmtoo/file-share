@@ -48,7 +48,7 @@ export const Upload = async () => {
           </fieldset>
           <div class="enc-checkbox">
             <input type="checkbox" name="encrypt" id="encrypt" />
-            <label for="encrypt">Enable Encryption</label>
+            <label for="encrypt">Enable end-to-end encryption</label>
             <SVGShield />
           </div>
           <button type="submit">Upload</button>
