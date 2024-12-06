@@ -3,8 +3,8 @@ import { Layout } from "./Layout.tsx";
 const options = [
   {
     id: "minute",
-    value: 60000,
-    text: "1 Minute",
+    value: 300000,
+    text: "5 Minutes",
   },
   {
     id: "hour",

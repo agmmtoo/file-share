@@ -34,7 +34,7 @@ app.use(
 app.get("/download/:id", async (c) => {
   const id = c.req.param("id");
   const item = await kv.get<Item>([STORE_KEY, id]);
-  
+
   if (!item.value) {
     return c.html(<NotFound />);
   }
@@ -75,7 +75,7 @@ app.post(
     "json",
     z.object({
       expire: z.union([
-        z.literal(60000),
+        z.literal(300000),
         z.literal(3600000),
         z.literal(86400000),
       ]),
@@ -95,9 +95,9 @@ app.post(
     const created = new Date().getTime();
     const expireAt = created + v.expire;
 
-    const putURL = await createPresignedUrl(key.toString());
+    const putURL = await createPresignedUrl(v.name);
 
-    const getURL = await getPresignedUrl(key.toString(), v.expire / 1000);
+    const getURL = await getPresignedUrl(v.name, v.expire / 1000);
 
     await kv.set([STORE_KEY, key.toString()], {
       key,
