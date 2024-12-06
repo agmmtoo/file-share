@@ -1,4 +1,5 @@
 import { Layout } from "./Layout.tsx";
+import { SVGShield } from "./SVGShield.tsx";
 
 const options = [
   {
@@ -45,6 +46,11 @@ export const Upload = async () => {
               </>
             ))}
           </fieldset>
+          <div class="enc-checkbox">
+            <input type="checkbox" name="encrypt" id="encrypt" />
+            <label for="encrypt">Enable Encryption</label>
+            <SVGShield />
+          </div>
           <button type="submit">Upload</button>
           {/* <!-- <progress id="progress" value="0" max="100"></progress> --> */}
         </form>

@@ -62,6 +62,20 @@ form#form {
       }
     }
   }
+
+  .enc-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+}
+
+.svg-shield {
+  display: block;
+  width: 1.2rem;
+}
+#encrypt:not(:checked) ~ .svg-shield {
+  display: none;
 }
 
 div#download {

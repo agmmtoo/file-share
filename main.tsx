@@ -81,6 +81,7 @@ app.post(
       ]),
       name: z.string(),
       size: z.number(),
+      encrypt: z.boolean(),
     })
   ),
   async (c) => {
@@ -106,9 +107,10 @@ app.post(
       url: getURL,
       created,
       expire: expireAt,
+      encrypt: v.encrypt,
     });
 
-    console.log("saved to kv: ", STORE_KEY, key, expireAt);
+    console.log("saved to kv: ", STORE_KEY, key, expireAt, v.encrypt);
 
     const redirect = `/download/${key.toString()}`;
 

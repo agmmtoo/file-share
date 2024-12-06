@@ -6,4 +6,5 @@ export type Item = {
 
   name: string;
   url: string;
+  encrypt: boolean;
 };
