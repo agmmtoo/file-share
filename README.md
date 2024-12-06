@@ -52,7 +52,7 @@ S3 Bucket > Permissions > CORS configuration
 [
   {
     "AllowedHeaders": ["*"],
-    "AllowedMethods": ["PUT"],
+    "AllowedMethods": ["GET","PUT"],
     "AllowedOrigins": ["https://file-share.deno.dev"],
     "ExposeHeaders": ["ETag"],
     "MaxAgeSeconds": 3000
