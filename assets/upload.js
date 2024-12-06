@@ -36,7 +36,7 @@ formElem.addEventListener("submit", async function onsubmit(e) {
 
       // Generate encryption key
       encKey = await window.crypto.subtle.generateKey(
-        { name: "AES-GCM", length: 256 },
+        { name: "AES-GCM", length: 128 },
         true,
         ["encrypt", "decrypt"]
       );

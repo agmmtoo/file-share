@@ -7,7 +7,7 @@ share.addEventListener("click", () => {
     if (navigator.share) {
         const shareButton = document.querySelector("#share-button");
 
-        shareButton.addEventListener("click", async function() {
+        shareButton.addEventListener("click", async function () {
             try {
                 this.disabled = true;
                 await navigator.share({
@@ -30,7 +30,8 @@ copy.addEventListener("click", async function () {
         console.error("Clipboard API not supported");
         return;
     }
-    await navigator.clipboard.writeText(this.dataset.link)
+    const link = this.dataset.encrypt === "true" ? window.location.href : this.dataset.presignedUrl;
+    await navigator.clipboard.writeText(link)
     this.innerText = "Copied!";
     this.disabled = true;
     setTimeout(() => {

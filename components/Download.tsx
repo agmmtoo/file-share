@@ -22,8 +22,7 @@ export const Download: FC<{ qrcode: string; item: Item }> = async ({
         </figure>
       </section>
       <section style="text-align: center; margin: 1rem 0;">
-        {item.encrypt ? <SVGShield /> : null}
-        <span>Available until: </span>{" "}
+        <span>{item.encrypt ? <SVGShield /> : null}Available until: </span>{" "}
         <time data-expire={item.expire} id="expire" datetime={item.expire}>
           {exp}
         </time>
@@ -33,7 +32,12 @@ export const Download: FC<{ qrcode: string; item: Item }> = async ({
           <button id="download-button">Download</button>
         </a>
         <button id="share-button">Share</button>
-        <button id="copy-button" data-name={item.name} data-link={item.url}>
+        <button
+          id="copy-button"
+          data-name={item.name}
+          data-presigned-url={item.url}
+          data-encrypt={item.encrypt}
+        >
           Copy Link
         </button>
       </section>

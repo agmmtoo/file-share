@@ -1,7 +1,7 @@
 
 async function decryptFile() {
     const url = new URL(window.location.href);
-    const keyFragment = url.hash.substring(1);
+    let keyFragment = url.hash.substring(1);
 
     if (!keyFragment) {
         keyFragment = prompt("Enter the decryption key:");
@@ -22,7 +22,7 @@ async function decryptFile() {
             ["decrypt"],
         );
         
-        const presignedUrl = document.getElementById("copy-button").dataset.link;
+        const presignedUrl = document.getElementById("copy-button").dataset.presignedUrl;
         const name = document.getElementById("copy-button").dataset.name;
 
         const res = await fetch(presignedUrl);
