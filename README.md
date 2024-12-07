@@ -34,13 +34,12 @@ tl;dr: Upload file, get link, share link.
 
 - [x] Basic features
 - [ ] Write README
-- [ ] Add file expiration
+- [x] Add file expiration
 - [x] Add file size limit
 - [ ] Add file type limit
 - [ ] Add file download limit
-- [ ] Add file download count limit
-- [ ] Add file password protection
-- [ ] Add file encryption
+- ~Add file password protection~
+- [x] Add file encryption
 - [ ] Add file compression
 - [ ] Add file comments
 
