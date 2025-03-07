@@ -16,7 +16,7 @@ export const Layout: FC = (props) => {
       <body>
         <main>{props.children}</main>
         <footer class="footer">
-          Made with 🩶 by <a href="https://github.com/agmmtoo">agmmtoo</a>.
+          Made with &lt;3 by <a href="https://github.com/agmmtoo">agmmtoo</a>.
         </footer>
       </body>
     </html>

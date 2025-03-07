@@ -87,9 +87,9 @@ app.post(
   async (c) => {
     const v = c.req.valid("json");
 
-    if (v.size > 10 * 1024 * 1024) {
+    if (v.size > 256 * 1024 * 1024) {
       c.status(STATUS_CODE.BadRequest);
-      return c.text("File size too large! (max 10MB)");
+      return c.text("File size too large! (max 256MB)");
     }
 
     const key = getKey();

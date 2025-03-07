@@ -1,6 +1,7 @@
 const expire = document.getElementById("expire");
 const share = document.getElementById("share-button");
 const copy = document.getElementById("copy-button");
+const svg = document.querySelector("svg");
 
 share.addEventListener("click", () => {
     if (navigator.share) {
@@ -54,8 +55,18 @@ const countdown = () => {
     expire.textContent = `${hours}:${minutes}:${seconds}`;
 };
 
-// set random 127, 127, 127 color
-// document.documentElement.style.setProperty('--color-theme', `${Math.floor(Math.random() * 128) + 128}, ${Math.floor(Math.random() * 128) + 128}, ${Math.floor(Math.random() * 128) + 128}`);
+const themes = [
+    [135, 132, 192],
+    [225, 42, 251],
+    [255, 32, 86],
+    [173, 70, 255],
+]
+
+svg.addEventListener("click", () => {
+    // pick a random theme
+    const theme = themes[Math.floor(Math.random() * themes.length)]
+    document.documentElement.style.setProperty('--color-theme', `${theme[0]}, ${theme[1]}, ${theme[2]}`);
+});
 
 countdown();
 setInterval(countdown, 1e3);
