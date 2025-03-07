@@ -38,8 +38,9 @@ export const Download: FC<{ qrcode: string; item: Item }> = async ({
         >
           <button id="download-button">Download</button>
         </a>
-        {/* <button id="share-button">Share</button> */}
-        <a href="/">Share Another</a>
+        <a href="/">
+          <button id="share-button">Share Another</button>
+        </a>
         <button
           id="copy-button"
           data-name={item.name}

@@ -1,25 +1,21 @@
 const expire = document.getElementById("expire");
 const share = document.getElementById("share-button");
 const copy = document.getElementById("copy-button");
-const svg = document.querySelector("svg");
+const svg = document.getElementsByTagName("svg")[0];
 
-share.addEventListener("click", () => {
+share.addEventListener("click", async function () {
     if (navigator.share) {
-        const shareButton = document.querySelector("#share-button");
-
-        shareButton.addEventListener("click", async function () {
-            try {
-                this.disabled = true;
-                await navigator.share({
-                    title: document.title,
-                    url: window.location.href,
-                });
-            } catch (error) {
-                console.error("Error sharing:", error.message);
-            } finally {
-                this.disabled = false;
-            }
-        });
+        // try {
+        //     this.disabled = true;
+        //     await navigator.share({
+        //         title: document.title,
+        //         url: window.location.href,
+        //     });
+        // } catch (error) {
+        //     console.error("Error sharing:", error.message);
+        // } finally {
+        //     this.disabled = false;
+        // }
     } else {
         console.log("Web Share API not supported");
     }
