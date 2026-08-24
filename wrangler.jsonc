@@ -1,0 +1,52 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "file-share",
+	"main": "worker/index.ts",
+	"compatibility_date": "2026-08-19",
+	"assets": {
+		"not_found_handling": "single-page-application",
+		"run_worker_first": [
+			"/api/*"
+		]
+	},
+	"kv_namespaces": [
+		{
+			// Replace with real id from: yarn wrangler kv namespace create METADATA
+			"binding": "METADATA",
+			"id": "__METADATA_ID__"
+		}
+	],
+	"r2_buckets": [
+		{
+      // Create with: yarn wrangler r2 bucket create file-share
+      "binding": "FILES",
+      "bucket_name": "file-share"
+		}
+	],
+	"vars": {
+		"MAX_FILE_SIZE": "104857600"
+	},
+	// Per-IP rate limits. namespace_id is any number unique within this account;
+	// simple.period only accepts 10 or 60 (seconds).
+	"ratelimits": [
+		{
+			"name": "SHARE_LIMIT",
+			"namespace_id": "1001",
+			"simple": {
+				"limit": 10,
+				"period": 60
+			}
+		},
+		{
+			"name": "DOWNLOAD_LIMIT",
+			"namespace_id": "1002",
+			"simple": {
+				"limit": 60,
+				"period": 60
+			}
+		}
+	],
+	"observability": {
+		"enabled": true
+	}
+}
