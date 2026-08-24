@@ -11,16 +11,15 @@
 	},
 	"kv_namespaces": [
 		{
-			// Replace with real id from: yarn wrangler kv namespace create METADATA
-			"binding": "METADATA",
-			"id": "__METADATA_ID__"
+			// Namespace title and binding name both "file_share".
+			"binding": "file_share",
+			"id": "709d53a6f2ed45978a4a236cf3a94fa4"
 		}
 	],
 	"r2_buckets": [
 		{
-      // Create with: yarn wrangler r2 bucket create file-share
-      "binding": "FILES",
-      "bucket_name": "file-share"
+			"binding": "FILES",
+			"bucket_name": "file-share"
 		}
 	],
 	"vars": {

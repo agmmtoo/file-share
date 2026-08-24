@@ -9,7 +9,7 @@ import {
 } from "../shared/types"
 
 export type Bindings = {
-  METADATA: KVNamespace
+  file_share: KVNamespace
   FILES: R2Bucket
   MAX_FILE_SIZE: string
   /** Rate limiters, keyed by client IP. Absent when the binding is unconfigured. */
@@ -55,7 +55,7 @@ async function getMeta(
   env: Bindings,
   id: string
 ): Promise<StoredMeta | "not_found" | "expired"> {
-  const raw = await env.METADATA.get(metaKey(id))
+  const raw = await env.file_share.get(metaKey(id))
   if (!raw) return "not_found"
   const meta = JSON.parse(raw) as StoredMeta
   if (!meta.finalized || meta.expiresAt < Date.now()) return "expired"
@@ -66,7 +66,7 @@ async function deleteShare(env: Bindings, id: string, meta: StoredMeta | null) {
   if (meta && !meta.finalized) {
     await env.FILES.delete(id)
   }
-  await env.METADATA.delete(metaKey(id))
+  await env.file_share.delete(metaKey(id))
 }
 
 const app = new Hono<AppEnv>().basePath("/api")
@@ -112,7 +112,7 @@ app.post("/uploads", async (c) => {
   let id = ""
   for (let attempt = 0; attempt < 5; attempt++) {
     id = generateId()
-    if (!(await c.env.METADATA.get(metaKey(id)))) break
+    if (!(await c.env.file_share.get(metaKey(id)))) break
     if (attempt === 4) return c.json({ error: "id_exhausted" }, 500)
   }
 
@@ -132,7 +132,7 @@ app.post("/uploads", async (c) => {
     expiresAt: now + ttl * 1000,
   }
 
-  await c.env.METADATA.put(metaKey(id), JSON.stringify(meta), {
+  await c.env.file_share.put(metaKey(id), JSON.stringify(meta), {
     expirationTtl: ttl,
   })
 
@@ -140,11 +140,11 @@ app.post("/uploads", async (c) => {
 })
 
 app.put("/uploads/:id", async (c) => {
-  const { FILES, METADATA } = c.env
+  const { FILES, file_share } = c.env
   const id = c.req.param("id")
   if (!/^[a-z0-9]{6}$/.test(id)) return c.json({ error: "invalid_id" }, 400)
 
-  const raw = await METADATA.get(metaKey(id))
+  const raw = await file_share.get(metaKey(id))
   if (!raw) return c.json({ error: "not_found" }, 404)
   const meta = JSON.parse(raw) as StoredMeta
   if (meta.finalized) return c.json({ error: "already_uploaded" }, 409)
@@ -166,7 +166,7 @@ app.put("/uploads/:id", async (c) => {
   })
 
   meta.finalized = true
-  await METADATA.put(metaKey(id), JSON.stringify(meta), {
+  await file_share.put(metaKey(id), JSON.stringify(meta), {
     expirationTtl: Math.max(MIN_TTL, Math.ceil((meta.expiresAt - Date.now()) / 1000)),
   })
 
