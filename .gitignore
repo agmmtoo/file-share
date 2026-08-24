@@ -35,3 +35,9 @@ dist-ssr
 
 # Vite cache
 .vite/
+
+# Yarn: keep the pinned release, drop everything generated
+.yarn/*
+!.yarn/releases
+.pnp.*
+
