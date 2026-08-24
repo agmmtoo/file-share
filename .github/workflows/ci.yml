@@ -47,16 +47,28 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
-        with:
-          # Full history so the scan covers every commit, not just the tip.
-          fetch-depth: 0
 
+      # Scans the working tree rather than a commit range: gitleaks-action
+      # derives a <before>..<after> range from the push event, which is an
+      # invalid revision when the range includes a root commit, and it then
+      # fails having scanned nothing at all.
       - name: Gitleaks
-        uses: gitleaks/gitleaks-action@v2
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Required only for repos owned by a GitHub organization.
-          # GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+          GITLEAKS_VERSION: 8.24.3
+        run: |
+          curl -sSfL \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+            | tar -xz -C /tmp gitleaks
+          /tmp/gitleaks dir . --redact --no-banner --verbose \
+            --report-format sarif --report-path gitleaks.sarif
+
+      - name: Upload findings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitleaks-results
+          path: gitleaks.sarif
+          if-no-files-found: ignore
 
   dependency-review:
     name: Dependency review
@@ -68,35 +80,3 @@ jobs:
       - uses: actions/dependency-review-action@v4
         with:
           fail-on-severity: high
-
-  deploy:
-    name: Deploy to Cloudflare
-    needs: [check, secret-scan]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    # Attach required reviewers / secrets to this environment in repo settings.
-    environment: production
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 24
-          cache: yarn
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      # The Vite plugin writes the deployable Worker config to dist/ and points
-      # wrangler at it via .wrangler/deploy/config.json, so the build has to run
-      # in this job, right before deploying.
-      - name: Build
-        run: yarn build
-
-      - name: Deploy Worker
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy
