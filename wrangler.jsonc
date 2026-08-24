@@ -23,7 +23,7 @@
 		}
 	],
 	"vars": {
-		"MAX_FILE_SIZE": "104857600"
+		"MAX_FILE_SIZE": "67108864"
 	},
 	// Per-IP rate limits. namespace_id is any number unique within this account;
 	// simple.period only accepts 10 or 60 (seconds).
