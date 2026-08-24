@@ -22,3 +22,16 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Cloudflare / Wrangler local state (miniflare KV + R2 blobs, deploy metadata)
+.wrangler/
+
+# Local secrets: wrangler reads .dev.vars for local bindings
+.dev.vars
+.dev.vars.*
+.env
+.env.*
+!.env.example
+
+# Vite cache
+.vite/
