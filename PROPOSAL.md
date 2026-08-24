@@ -1,6 +1,6 @@
-# file-share-v2 — Proposal
+# file-share — Proposal
 
-Port of `../file-share` (Deno + JSX SSR + Deno KV + S3) to a modern full-stack
+Port of `~/projects/file-share` (Deno + JSX SSR + Deno KV + S3) to a modern full-stack
 Cloudflare Workers app: **Hono** (API) + **React + Vite** (SPA) + **shadcn/ui**,
 using only Cloudflare primitives (R2, Workers KV, Workers Assets).
 
@@ -25,11 +25,11 @@ Flow reverse-engineered from the old codebase:
 Known issues worth fixing in the port:
 - **Encryption bug**: decrypt.js uses an all-zero IV (`new Uint8Array(12)`),
   i.e. the IV is never stored — decryption only works by luck/collision.
-  v2 will store the IV alongside the ciphertext (proper construction).
-- Ids are sequential-ish numbers (`Math.random` between 100000–999999) — v2 uses
+  the port stores the IV alongside the ciphertext (proper construction).
+- Ids are sequential-ish numbers (`Math.random` between 100000–999999) — the port uses
   crypto-random alphanumeric ids.
 - Presigned GET url lifetime is capped at the share duration at creation time;
-  v2 serves downloads through the Worker so expiry is enforced per-request.
+  the port serves downloads through the Worker so expiry is enforced per-request.
 - AWS SDK presigning doesn't work inside Workers runtime anyway (needs Node APIs).
 
 ## 2. Target architecture
@@ -68,7 +68,7 @@ Worker (Hono)
 
 ```jsonc
 {
-  "name": "file-share-v2",
+  "name": "file-share",
   "main": "worker/index.ts",
   "compatibility_date": "<today>",
   "assets": {
@@ -76,7 +76,7 @@ Worker (Hono)
     "run_worker_first": ["/api/*"]
   },
   "kv_namespaces": [{ "binding": "METADATA", "id": "..." }],
-  "r2_buckets":   [{ "binding": "FILES", "bucket_name": "file-share-v2" }],
+  "r2_buckets":   [{ "binding": "FILES", "bucket_name": "file-share" }],
   "vars": { "MAX_FILE_SIZE": "104857600", "BASE_URL": "" }
 }
 ```
@@ -84,7 +84,7 @@ Worker (Hono)
 ### Project layout
 
 ```
-file-share-v2/
+file-share/
 ├── src/                    # React SPA
 │   ├── routes/
 │   │   ├── UploadPage.tsx        # dropzone, expiry picker, encrypt toggle
