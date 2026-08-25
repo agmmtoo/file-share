@@ -39,6 +39,17 @@
     --color-card: var(--card);
     --color-foreground: var(--foreground);
     --color-background: var(--background);
+    --color-brutal: var(--brutal);
+    --color-brand: var(--brand);
+    --color-brand-foreground: var(--brand-foreground);
+    --color-success: var(--success);
+    --color-success-foreground: var(--success-foreground);
+    --shadow-brutal-xs: 2px 2px 0 0 var(--brutal);
+    --shadow-brutal-sm: 3px 3px 0 0 var(--brutal);
+    --shadow-brutal: 4px 4px 0 0 var(--brutal);
+    --shadow-brutal-lg: 6px 6px 0 0 var(--brutal);
+    --shadow-brutal-xl: 8px 8px 0 0 var(--brutal);
+    --ease-brutal: cubic-bezier(0.2, 0.9, 0.25, 1);
     --radius-sm: calc(var(--radius) * 0.6);
     --radius-md: calc(var(--radius) * 0.8);
     --radius-lg: var(--radius);
@@ -72,7 +83,13 @@
     --chart-3: oklch(0.45 0.017 213.2);
     --chart-4: oklch(0.378 0.015 216);
     --chart-5: oklch(0.275 0.011 216.9);
-    --radius: 0.625rem;
+    --radius: 0rem;
+    --brutal: oklch(0.148 0.004 228.8);
+    --grid-line: oklch(0.925 0.005 214.3);
+    --brand: oklch(0.87 0.18 96);
+    --brand-foreground: oklch(0.148 0.004 228.8);
+    --success: oklch(0.82 0.19 145);
+    --success-foreground: oklch(0.148 0.004 228.8);
     --sidebar: oklch(0.987 0.002 197.1);
     --sidebar-foreground: oklch(0.148 0.004 228.8);
     --sidebar-primary: oklch(0.218 0.008 223.9);
@@ -99,14 +116,20 @@
     --accent: oklch(0.275 0.011 216.9);
     --accent-foreground: oklch(0.987 0.002 197.1);
     --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
+    --border: oklch(1 0 0 / 22%);
+    --input: oklch(1 0 0 / 22%);
     --ring: oklch(0.56 0.021 213.5);
     --chart-1: oklch(0.872 0.007 219.6);
     --chart-2: oklch(0.56 0.021 213.5);
     --chart-3: oklch(0.45 0.017 213.2);
     --chart-4: oklch(0.378 0.015 216);
     --chart-5: oklch(0.275 0.011 216.9);
+    --brutal: oklch(0.987 0.002 197.1);
+    --grid-line: oklch(1 0 0 / 7%);
+    --brand: oklch(0.87 0.18 96);
+    --brand-foreground: oklch(0.148 0.004 228.8);
+    --success: oklch(0.82 0.19 145);
+    --success-foreground: oklch(0.148 0.004 228.8);
     --sidebar: oklch(0.218 0.008 223.9);
     --sidebar-foreground: oklch(0.987 0.002 197.1);
     --sidebar-primary: oklch(0.488 0.243 264.376);
@@ -130,4 +153,47 @@
   html {
     @apply font-mono;
     }
+}
+@layer base {
+  body {
+    /* Faint grid: the flat backdrop neo-brutalist blocks sit on. */
+    background-image:
+      linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+}
+
+@utility brutal-press {
+  /* Lift on hover, slam flush on press. Shadow offset tracks the movement so
+     the block always looks like it is physically sitting on the page. */
+  box-shadow: var(--shadow-brutal);
+  transition:
+    transform 150ms var(--ease-brutal),
+    box-shadow 150ms var(--ease-brutal),
+    background-color 150ms var(--ease-brutal),
+    color 150ms var(--ease-brutal);
+
+  &:hover:not(:disabled):not([data-disabled]) {
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-brutal-lg);
+  }
+
+  &:active:not(:disabled):not([data-disabled]) {
+    transform: translate(2px, 2px);
+    box-shadow: 0 0 0 0 var(--brutal);
+  }
+
+  &:disabled,
+  &[data-disabled] {
+    box-shadow: var(--shadow-brutal-xs);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 1ms !important;
+  }
 }

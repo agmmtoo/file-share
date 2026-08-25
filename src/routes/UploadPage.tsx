@@ -139,7 +139,7 @@ export function UploadPage() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
-        <CardTitle>Share a file</CardTitle>
+        <CardTitle className="text-base uppercase">Share a file</CardTitle>
         <CardDescription>
           Files are stored temporarily and expire automatically.
           {maxFileSize !== null && ` ${formatBytes(maxFileSize)} max.`}
@@ -164,10 +164,11 @@ export function UploadPage() {
           <Label
             htmlFor="file-input"
             data-dragging={dragging || undefined}
-            className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed p-8 text-center transition-colors hover:bg-accent data-dragging:border-primary data-dragging:bg-primary/10"
+            data-selected={file ? true : undefined}
+            className="group flex cursor-pointer flex-col items-center justify-center gap-2 rounded-none border-3 border-dashed border-brutal p-8 text-center transition-all duration-200 ease-(--ease-brutal) hover:-translate-y-0.5 hover:bg-muted hover:shadow-brutal data-dragging:-translate-y-1 data-dragging:scale-[1.01] data-dragging:border-solid data-dragging:bg-brand data-dragging:text-brand-foreground data-dragging:shadow-brutal-lg data-selected:border-solid data-selected:bg-muted data-selected:shadow-brutal-sm"
           >
-            <Upload className="size-6 text-muted-foreground" />
-            <span className="font-medium text-sm">
+            <Upload className="size-7 transition-transform duration-200 ease-(--ease-brutal) group-data-dragging:-translate-y-0.5" />
+            <span className="text-sm font-bold tracking-tight break-all">
               {dragging
                 ? "Drop to attach"
                 : file
@@ -175,7 +176,7 @@ export function UploadPage() {
                   : "Drop a file here, or click to choose"}
             </span>
             {file && !dragging && (
-              <span className="text-muted-foreground text-xs">
+              <span className="border-2 border-brutal bg-brand px-1.5 py-px text-[10px] font-bold tracking-widest text-brand-foreground uppercase">
                 {formatBytes(file.size)}
               </span>
             )}
@@ -183,7 +184,9 @@ export function UploadPage() {
         </div>
 
         <div className="flex flex-col gap-3">
-          <Label>Expires after</Label>
+          <Label className="text-[10px] font-bold tracking-widest uppercase">
+            Expires after
+          </Label>
           <RadioGroup
             value={expiry}
             onValueChange={(v) => setExpiry(v as ExpiryOption)}
@@ -194,7 +197,7 @@ export function UploadPage() {
               <Label
                 key={choice.value}
                 htmlFor={`expiry-${choice.value}`}
-                className="flex flex-1 cursor-pointer items-center justify-center rounded-lg border p-2.5 font-normal text-sm transition-colors hover:bg-accent has-[[data-slot=radio-group-item][data-checked]]:border-primary has-[[data-slot=radio-group-item][data-checked]]:bg-primary/10"
+                className="flex flex-1 cursor-pointer items-center justify-center rounded-none border-2 border-brutal p-2.5 text-xs font-bold tracking-wide uppercase transition-all duration-150 ease-(--ease-brutal) hover:-translate-y-0.5 hover:shadow-brutal-sm has-[[data-slot=radio-group-item][data-checked]]:-translate-y-0.5 has-[[data-slot=radio-group-item][data-checked]]:bg-brand has-[[data-slot=radio-group-item][data-checked]]:text-brand-foreground has-[[data-slot=radio-group-item][data-checked]]:shadow-brutal-sm"
               >
                 <RadioGroupItem
                   value={choice.value}
@@ -207,10 +210,13 @@ export function UploadPage() {
           </RadioGroup>
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between border-2 border-brutal bg-muted p-2.5 transition-colors duration-200 has-[[data-checked]]:bg-brand has-[[data-checked]]:text-brand-foreground">
           <div className="flex items-center gap-2">
-            <Lock className="size-4 text-muted-foreground" />
-            <Label htmlFor="encrypt-switch" className="cursor-pointer">
+            <Lock className="size-4" />
+            <Label
+              htmlFor="encrypt-switch"
+              className="cursor-pointer text-[10px] font-bold tracking-widest uppercase"
+            >
               End-to-end encrypted
             </Label>
           </div>
@@ -222,21 +228,22 @@ export function UploadPage() {
           />
         </div>
 
-        {phase === "uploading" && (
-          <Progress value={progress} className="h-2" />
-        )}
+        {phase === "uploading" && <Progress value={progress} />}
         {phase === "done" && (
-          <p className="text-muted-foreground text-sm">
-            Share link created — opening…
+          <p className="border-2 border-brutal bg-success px-2.5 py-2 text-xs font-bold tracking-wide text-success-foreground uppercase">
+            Share link created, opening…
           </p>
         )}
         {phase === "error" && (
-          <p className="text-destructive text-sm">{errorMsg}</p>
+          <p className="border-2 border-destructive bg-destructive/10 px-2.5 py-2 text-xs text-destructive">
+            {errorMsg}
+          </p>
         )}
 
         <Button
           onClick={handleUpload}
           disabled={!file || busy || tooLarge || phase === "done"}
+          size="lg"
           className="w-full"
         >
           {busy ? (
@@ -255,7 +262,12 @@ export function UploadPage() {
         </Button>
 
         {phase === "error" && (
-          <Button variant="outline" onClick={reset} className="w-full">
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={reset}
+            className="w-full"
+          >
             Start over
           </Button>
         )}

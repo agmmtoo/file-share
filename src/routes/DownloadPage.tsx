@@ -17,7 +17,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { CopyButton } from "@/components/CopyButton"
+import { CopyLinkBox } from "@/components/CopyLinkBox"
 import { QrCode } from "@/components/QrCode"
 import { ApiError, downloadFile, getFile, saveBlob } from "@/lib/api"
 import { decryptData } from "@/lib/crypto"
@@ -52,7 +52,10 @@ export function DownloadPage() {
       })
       .catch((err: unknown) => {
         if (cancelled) return
-        if (err instanceof ApiError && (err.status === 404 || err.status === 410)) {
+        if (
+          err instanceof ApiError &&
+          (err.status === 404 || err.status === 410)
+        ) {
           setLoad({
             status: "gone",
             reason: err.status === 410 ? "expired" : "not_found",
@@ -93,7 +96,10 @@ export function DownloadPage() {
       }
       setPhase("saved")
     } catch (err) {
-      if (err instanceof ApiError && (err.status === 404 || err.status === 410)) {
+      if (
+        err instanceof ApiError &&
+        (err.status === 404 || err.status === 410)
+      ) {
         setLoad({
           status: "gone",
           reason: err.status === 410 ? "expired" : "not_found",
@@ -111,7 +117,7 @@ export function DownloadPage() {
 
   if (load.status === "loading") {
     return (
-      <div className="flex items-center gap-2 text-muted-foreground text-sm">
+      <div className="flex items-center gap-2 border-2 border-brutal bg-card px-3 py-2 text-xs font-bold tracking-widest uppercase shadow-brutal">
         <Loader2 className="size-4 animate-spin" />
         Loading…
       </div>
@@ -123,8 +129,12 @@ export function DownloadPage() {
     return (
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            {gone === "expired" ? <Timer className="size-5" /> : <FileWarning className="size-5" />}
+          <CardTitle className="flex items-center gap-2 text-base uppercase">
+            {gone === "expired" ? (
+              <Timer className="size-5" />
+            ) : (
+              <FileWarning className="size-5" />
+            )}
             {gone === "expired" ? "This link has expired" : "Nothing here"}
           </CardTitle>
           <CardDescription>
@@ -136,6 +146,7 @@ export function DownloadPage() {
         <CardContent>
           <Button
             variant="outline"
+            size="lg"
             className="w-full"
             render={<a href="/" />}
           >
@@ -150,7 +161,9 @@ export function DownloadPage() {
     return (
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Something went wrong</CardTitle>
+          <CardTitle className="text-base uppercase">
+            Something went wrong
+          </CardTitle>
           <CardDescription>{load.message}</CardDescription>
         </CardHeader>
       </Card>
@@ -163,17 +176,19 @@ export function DownloadPage() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
-        <CardTitle className="break-all">{meta!.name}</CardTitle>
-        <CardDescription className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <span>{formatBytes(meta!.size)}</span>
-          <span className="flex items-center gap-1">
-            <Clock className="size-3.5" />
-            expires in {timeLeft(meta!.expiresAt)}
+        <CardTitle className="text-base break-all">{meta!.name}</CardTitle>
+        <CardDescription className="flex flex-wrap items-center gap-1.5 pt-1">
+          <span className="border-2 border-brutal px-1.5 py-px text-[10px] font-bold tracking-widest text-foreground uppercase">
+            {formatBytes(meta!.size)}
+          </span>
+          <span className="flex items-center gap-1 border-2 border-brutal px-1.5 py-px text-[10px] font-bold tracking-widest text-foreground uppercase">
+            <Clock className="size-3" />
+            {timeLeft(meta!.expiresAt)} left
           </span>
           {meta!.encrypted && (
-            <span className="flex items-center gap-1">
-              <Lock className="size-3.5" />
-              end-to-end encrypted
+            <span className="flex items-center gap-1 border-2 border-brutal bg-brand px-1.5 py-px text-[10px] font-bold tracking-widest text-brand-foreground uppercase">
+              <Lock className="size-3" />
+              encrypted
             </span>
           )}
         </CardDescription>
@@ -181,33 +196,33 @@ export function DownloadPage() {
       <CardContent className="flex flex-col gap-6">
         <div className="flex flex-col items-center gap-4">
           <QrCode text={shareUrl} />
-          <div className="flex w-full items-center gap-2">
-            <code className="flex-1 truncate rounded-md border bg-muted px-3 py-2 text-xs">
-              {shareUrl}
-            </code>
-            <CopyButton url={shareUrl} />
-          </div>
+          <CopyLinkBox url={shareUrl} />
         </div>
 
         {missingKey && (
-          <p className="text-destructive text-sm">
+          <p className="border-2 border-destructive bg-destructive/10 px-2.5 py-2 text-xs text-destructive">
             This file is encrypted and the link is missing its decryption key
-            (the part after <span className="font-mono">#</span>). Ask the sender
-            for the full link.
+            (the part after <span className="font-bold">#</span>). Ask the
+            sender for the full link.
           </p>
         )}
 
-        {busy && <Progress value={progress} className="h-2" />}
+        {busy && <Progress value={progress} />}
         {phase === "saved" && (
-          <p className="text-muted-foreground text-sm">Saved to your device.</p>
+          <p className="border-2 border-brutal bg-success px-2.5 py-2 text-xs font-bold tracking-wide text-success-foreground uppercase">
+            Saved to your device.
+          </p>
         )}
         {phase === "failed" && (
-          <p className="text-destructive text-sm">{errorMsg}</p>
+          <p className="border-2 border-destructive bg-destructive/10 px-2.5 py-2 text-xs text-destructive">
+            {errorMsg}
+          </p>
         )}
 
         <Button
           onClick={handleDownload}
           disabled={busy || missingKey}
+          size="lg"
           className="w-full"
         >
           {busy ? (

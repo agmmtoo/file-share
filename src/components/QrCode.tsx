@@ -13,5 +13,10 @@ export function QrCode({ text, size = 160 }: { text: string; size?: number }) {
     }).catch(() => {})
   }, [text, size])
 
-  return <canvas ref={ref} className="rounded-md border bg-white p-2" />
+  return (
+    <canvas
+      ref={ref}
+      className="rounded-none border-2 border-brutal bg-white p-2 shadow-brutal"
+    />
+  )
 }
