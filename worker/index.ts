@@ -159,9 +159,14 @@ const withUser = createMiddleware<AppEnv>(async (c, next) => {
 })
 
 // Sign-in and sign-up are the obvious credential-stuffing target, so they get
-// their own per-IP limiter rather than sharing the upload one.
+// their own per-IP limiter rather than sharing the upload one. Only the writes
+// are counted: every page load reads the session over GET, and charging those
+// to the same bucket makes an ordinary refresh look like a signed-out user.
 app.on(["GET", "POST"], "/auth/*", async (c) => {
-  if (await overLimit(c.env.AUTH_LIMIT, c.req.raw)) {
+  if (
+    c.req.method === "POST" &&
+    (await overLimit(c.env.AUTH_LIMIT, c.req.raw))
+  ) {
     return c.json({ error: "rate_limited" }, 429)
   }
   return createAuth(c.env).handler(c.req.raw)
