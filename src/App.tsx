@@ -1,5 +1,6 @@
 import { Link, Route, Routes } from "react-router"
 import { Files, LogOut, Share2 } from "lucide-react"
+import { Backdrop } from "@/components/Backdrop"
 import { Button } from "@/components/ui/button"
 import { UploadPage } from "@/routes/UploadPage"
 import { DownloadPage } from "@/routes/DownloadPage"
@@ -64,6 +65,7 @@ function AccountStrip() {
 export function App() {
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-6 p-6">
+      <Backdrop />
       <div className="flex w-full max-w-md flex-wrap items-center justify-between gap-3">
         <a
           href="/"
