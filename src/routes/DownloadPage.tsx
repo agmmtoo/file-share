@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { CopyLinkBox } from "@/components/CopyLinkBox"
+import { MetaBadge } from "@/components/MetaBadge"
 import { QrCode } from "@/components/QrCode"
 import { ApiError, downloadFile, getFile, saveBlob } from "@/lib/api"
 import { decryptData } from "@/lib/crypto"
@@ -25,11 +26,37 @@ import { describeError } from "@/lib/errors"
 import { formatBytes, timeLeft } from "@/lib/format"
 import type { FileMeta } from "../../shared/types"
 
+type GoneReason = "not_found" | "expired" | "exhausted"
+
 type LoadState =
   | { status: "loading" }
   | { status: "ready"; meta: FileMeta }
-  | { status: "gone"; reason: "not_found" | "expired" }
+  | { status: "gone"; reason: GoneReason }
   | { status: "error"; message: string }
+
+/**
+ * A share can be gone for three reasons and two of them are 410, so the code
+ * decides, not the status: a used-up download limit is not an expiry.
+ */
+function goneReason(err: ApiError): GoneReason {
+  if (err.status === 404) return "not_found"
+  return err.code === "download_limit_reached" ? "exhausted" : "expired"
+}
+
+const GONE_COPY: Record<GoneReason, { title: string; blurb: string }> = {
+  expired: {
+    title: "This link has expired",
+    blurb: "The file was deleted when its timer ran out.",
+  },
+  exhausted: {
+    title: "No downloads left",
+    blurb: "This link hit the download limit its sender set.",
+  },
+  not_found: {
+    title: "Nothing here",
+    blurb: "This share link is invalid or was already cleaned up.",
+  },
+}
 
 type Phase = "idle" | "downloading" | "decrypting" | "saved" | "failed"
 
@@ -56,10 +83,7 @@ export function DownloadPage() {
           err instanceof ApiError &&
           (err.status === 404 || err.status === 410)
         ) {
-          setLoad({
-            status: "gone",
-            reason: err.status === 410 ? "expired" : "not_found",
-          })
+          setLoad({ status: "gone", reason: goneReason(err) })
         } else {
           setLoad({ status: "error", message: describeError(err) })
         }
@@ -100,10 +124,7 @@ export function DownloadPage() {
         err instanceof ApiError &&
         (err.status === 404 || err.status === 410)
       ) {
-        setLoad({
-          status: "gone",
-          reason: err.status === 410 ? "expired" : "not_found",
-        })
+        setLoad({ status: "gone", reason: goneReason(err) })
         return
       }
       setErrorMsg(
@@ -125,23 +146,22 @@ export function DownloadPage() {
   }
 
   if (load.status === "gone" || expired) {
-    const gone = load.status === "gone" ? load.reason : "expired"
+    const gone: GoneReason = load.status === "gone" ? load.reason : "expired"
+    const copy = GONE_COPY[gone]
     return (
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base uppercase">
             {gone === "expired" ? (
               <Timer className="size-5" />
+            ) : gone === "exhausted" ? (
+              <Download className="size-5" />
             ) : (
               <FileWarning className="size-5" />
             )}
-            {gone === "expired" ? "This link has expired" : "Nothing here"}
+            {copy.title}
           </CardTitle>
-          <CardDescription>
-            {gone === "expired"
-              ? "The file was deleted when its timer ran out."
-              : "This share link is invalid or was already cleaned up."}
-          </CardDescription>
+          <CardDescription>{copy.blurb}</CardDescription>
         </CardHeader>
         <CardContent>
           <Button
@@ -149,6 +169,7 @@ export function DownloadPage() {
             size="lg"
             className="w-full"
             render={<a href="/" />}
+            nativeButton={false}
           >
             Share a file instead
           </Button>
@@ -178,18 +199,23 @@ export function DownloadPage() {
       <CardHeader>
         <CardTitle className="text-base break-all">{meta!.name}</CardTitle>
         <CardDescription className="flex flex-wrap items-center gap-1.5 pt-1">
-          <span className="border-2 border-brutal px-1.5 py-px text-[10px] font-bold tracking-widest text-foreground uppercase">
-            {formatBytes(meta!.size)}
-          </span>
-          <span className="flex items-center gap-1 border-2 border-brutal px-1.5 py-px text-[10px] font-bold tracking-widest text-foreground uppercase">
+          <MetaBadge>{formatBytes(meta!.size)}</MetaBadge>
+          <MetaBadge>
             <Clock className="size-3" />
             {timeLeft(meta!.expiresAt)} left
-          </span>
+          </MetaBadge>
           {meta!.encrypted && (
-            <span className="flex items-center gap-1 border-2 border-brutal bg-brand px-1.5 py-px text-[10px] font-bold tracking-widest text-brand-foreground uppercase">
+            <MetaBadge tone="brand">
               <Lock className="size-3" />
               encrypted
-            </span>
+            </MetaBadge>
+          )}
+          {meta!.maxDownloads !== null && (
+            <MetaBadge>
+              <Download className="size-3" />
+              {Math.max(0, meta!.maxDownloads - meta!.downloads)} of{" "}
+              {meta!.maxDownloads} left
+            </MetaBadge>
           )}
         </CardDescription>
       </CardHeader>

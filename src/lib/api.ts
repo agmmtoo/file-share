@@ -3,6 +3,7 @@ import type {
   CreateUploadInput,
   CreateUploadResult,
   FileMeta,
+  ShareList,
 } from "../../shared/types"
 
 export class ApiError extends Error {
@@ -69,6 +70,18 @@ export function uploadBlob(
     xhr.onerror = () => reject(new ApiError(0, "network_error"))
     xhr.send(blob)
   })
+}
+
+export async function listShares(): Promise<FileMeta[]> {
+  const res = await fetch("/api/shares")
+  if (!res.ok) await parseError(res)
+  const body = (await res.json()) as ShareList
+  return body.shares
+}
+
+export async function deleteShare(id: string): Promise<void> {
+  const res = await fetch(`/api/shares/${id}`, { method: "DELETE" })
+  if (!res.ok) await parseError(res)
 }
 
 export async function getFile(id: string): Promise<FileMeta> {

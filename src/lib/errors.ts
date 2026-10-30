@@ -15,6 +15,14 @@ export function describeError(err: unknown, maxFileSize?: number): string {
         return "This link expired while you were using it."
       case "not_found":
         return "This share no longer exists."
+      case "unauthorized":
+        return "Your session ended. Sign in again."
+      case "download_limit_reached":
+        return "This link hit its download limit."
+      case "expiry_not_allowed":
+        return "That expiry needs an account. Sign in and try again."
+      case "download_limit_not_allowed":
+        return "Download limits need an account. Sign in and try again."
       case "already_uploaded":
         return "This link was already used. Start over to share again."
       case "network_error":

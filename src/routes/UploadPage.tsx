@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react"
-import { Link2, Loader2, Lock, Upload } from "lucide-react"
-import { useNavigate } from "react-router"
+import { Download, Link2, Loader2, Lock, Upload } from "lucide-react"
+import { Link, useNavigate } from "react-router"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -9,49 +9,73 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Switch } from "@/components/ui/switch"
 import { createUpload, getConfig, uploadBlob } from "@/lib/api"
+import { useSession } from "@/lib/auth"
 import { encryptData, generateKeyB64 } from "@/lib/crypto"
 import { describeError } from "@/lib/errors"
-import { formatBytes } from "@/lib/format"
-import type { ExpiryOption } from "../../shared/types"
+import { expiryLabel, formatBytes } from "@/lib/format"
+import {
+  MAX_DOWNLOAD_LIMIT,
+  TIERS,
+  type AppConfig,
+  type ExpiryOption,
+} from "../../shared/types"
 
 type Phase = "idle" | "encrypting" | "creating" | "uploading" | "done" | "error"
 
-const EXPIRY_CHOICES: { value: ExpiryOption; label: string }[] = [
-  { value: "5m", label: "5 min" },
-  { value: "1h", label: "1 hour" },
-  { value: "24h", label: "24 hours" },
-]
+/** Compact forms for the radio row; expiryLabel() is the long form. */
+const SHORT_EXPIRY: Record<ExpiryOption, string> = {
+  "5m": "5 min",
+  "1h": "1 hour",
+  "24h": "24 h",
+  "7d": "7 days",
+  "30d": "30 days",
+}
 
 export function UploadPage() {
   const navigate = useNavigate()
+  const { data: session } = useSession()
   const [file, setFile] = useState<File | null>(null)
   const [expiry, setExpiry] = useState<ExpiryOption>("5m")
   const [encrypt, setEncrypt] = useState(false)
+  const [limitDownloads, setLimitDownloads] = useState(false)
+  const [maxDownloads, setMaxDownloads] = useState("1")
   const [phase, setPhase] = useState<Phase>("idle")
   const [progress, setProgress] = useState(0)
   const [errorMsg, setErrorMsg] = useState("")
   const [sharePath, setSharePath] = useState("")
-  const [maxFileSize, setMaxFileSize] = useState<number | null>(null)
+  const [config, setConfig] = useState<AppConfig | null>(null)
   const [dragging, setDragging] = useState(false)
 
+  const maxFileSize = config?.maxFileSize ?? null
+  const userId = session?.user.id ?? null
+
+  // Keyed on the session: signing in or out changes the caller's tier, so the
+  // limits have to be re-read rather than kept from the anonymous page load.
   useEffect(() => {
     let cancelled = false
     getConfig()
-      .then((config) => {
-        if (!cancelled) setMaxFileSize(config.maxFileSize)
+      .then((next) => {
+        if (cancelled) return
+        setConfig(next)
+        // Drop an expiry the new tier no longer allows (sign-out from 30d).
+        setExpiry((current) =>
+          next.expiryOptions.includes(current) ? current : next.expiryOptions[0]
+        )
+        if (!next.canLimitDownloads) setLimitDownloads(false)
       })
       .catch(() => {
-        // Non-fatal: the server still enforces the real limit on upload.
+        // Non-fatal: the server still enforces the real limits on upload.
       })
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [userId])
 
   const busy =
     phase === "encrypting" || phase === "creating" || phase === "uploading"
@@ -65,7 +89,9 @@ export function UploadPage() {
     setErrorMsg("")
     setSharePath("")
     setEncrypt(false)
-    setExpiry("5m")
+    setExpiry(config?.expiryOptions[0] ?? "5m")
+    setLimitDownloads(false)
+    setMaxDownloads("1")
   }
 
   const selectFile = useCallback(
@@ -118,6 +144,7 @@ export function UploadPage() {
         contentType: file.type || "application/octet-stream",
         encrypted: encrypt,
         expiresIn: expiry,
+        maxDownloads: limitDownloads ? Number(maxDownloads) : null,
       })
 
       setPhase("uploading")
@@ -129,7 +156,7 @@ export function UploadPage() {
       setErrorMsg(describeError(err, maxFileSize ?? undefined))
       setPhase("error")
     }
-  }, [file, expiry, encrypt, maxFileSize])
+  }, [file, expiry, encrypt, limitDownloads, maxDownloads, maxFileSize])
 
   useEffect(() => {
     if (phase !== "done" || !sharePath) return
@@ -193,18 +220,18 @@ export function UploadPage() {
             className="flex gap-2"
             disabled={busy}
           >
-            {EXPIRY_CHOICES.map((choice) => (
+            {(config?.expiryOptions ?? ["5m"]).map((option) => (
               <Label
-                key={choice.value}
-                htmlFor={`expiry-${choice.value}`}
+                key={option}
+                htmlFor={`expiry-${option}`}
                 className="flex flex-1 cursor-pointer items-center justify-center rounded-none border-2 border-brutal p-2.5 text-xs font-bold tracking-wide uppercase transition-all duration-150 ease-(--ease-brutal) hover:-translate-y-0.5 hover:shadow-brutal-sm has-[[data-slot=radio-group-item][data-checked]]:-translate-y-0.5 has-[[data-slot=radio-group-item][data-checked]]:bg-brand has-[[data-slot=radio-group-item][data-checked]]:text-brand-foreground has-[[data-slot=radio-group-item][data-checked]]:shadow-brutal-sm"
               >
                 <RadioGroupItem
-                  value={choice.value}
-                  id={`expiry-${choice.value}`}
+                  value={option}
+                  id={`expiry-${option}`}
                   className="sr-only"
                 />
-                {choice.label}
+                {SHORT_EXPIRY[option]}
               </Label>
             ))}
           </RadioGroup>
@@ -227,6 +254,63 @@ export function UploadPage() {
             disabled={busy}
           />
         </div>
+
+        {config?.canLimitDownloads ? (
+          <div className="flex flex-col gap-2.5">
+            <div className="flex items-center justify-between border-2 border-brutal bg-muted p-2.5 transition-colors duration-200 has-[[data-checked]]:bg-brand has-[[data-checked]]:text-brand-foreground">
+              <div className="flex items-center gap-2">
+                <Download className="size-4" />
+                <Label
+                  htmlFor="limit-switch"
+                  className="cursor-pointer text-[10px] font-bold tracking-widest uppercase"
+                >
+                  Limit downloads
+                </Label>
+              </div>
+              <Switch
+                id="limit-switch"
+                checked={limitDownloads}
+                onCheckedChange={setLimitDownloads}
+                disabled={busy}
+              />
+            </div>
+            {limitDownloads && (
+              <div className="flex items-center gap-2.5">
+                <Label
+                  htmlFor="max-downloads"
+                  className="text-[10px] font-bold tracking-widest uppercase"
+                >
+                  Allowed
+                </Label>
+                <Input
+                  id="max-downloads"
+                  type="number"
+                  min={1}
+                  max={MAX_DOWNLOAD_LIMIT}
+                  value={maxDownloads}
+                  onValueChange={(v) => setMaxDownloads(String(v))}
+                  disabled={busy}
+                  className="w-24"
+                />
+                <span className="text-[10px] text-muted-foreground">
+                  download{Number(maxDownloads) === 1 ? "" : "s"}, then the link
+                  dies
+                </span>
+              </div>
+            )}
+          </div>
+        ) : (
+          <p className="border-2 border-dashed border-brutal px-2.5 py-2 text-[10px] tracking-wide text-muted-foreground">
+            <Link
+              to="/signup"
+              className="font-bold text-foreground underline decoration-2 underline-offset-2"
+            >
+              Create an account
+            </Link>{" "}
+            for {formatBytes(TIERS.member.maxFileSize)} uploads, links up to{" "}
+            {expiryLabel("30d")}, and download limits.
+          </p>
+        )}
 
         {phase === "uploading" && <Progress value={progress} />}
         {phase === "done" && (
