@@ -9,11 +9,14 @@
 			"/api/*"
 		]
 	},
-	"kv_namespaces": [
+	// Share metadata. Replaced KV: a download cap needs an atomic counter, and
+	// KV's free tier allows 1,000 writes/day against D1's 100,000 rows/day.
+	"d1_databases": [
 		{
-			// Namespace title and binding name both "file_share".
-			"binding": "file_share",
-			"id": "709d53a6f2ed45978a4a236cf3a94fa4"
+			"binding": "DB",
+			"database_name": "file-share",
+			"database_id": "784aeb6d-03e1-4892-a47d-06da25c334a8",
+			"migrations_dir": "migrations"
 		}
 	],
 	"r2_buckets": [
@@ -22,9 +25,6 @@
 			"bucket_name": "file-share"
 		}
 	],
-	"vars": {
-		"MAX_FILE_SIZE": "67108864"
-	},
 	// Per-IP rate limits. namespace_id is any number unique within this account;
 	// simple.period only accepts 10 or 60 (seconds).
 	"ratelimits": [
@@ -41,6 +41,15 @@
 			"namespace_id": "1002",
 			"simple": {
 				"limit": 60,
+				"period": 60
+			}
+		},
+		{
+			// Sign-in / sign-up. Tighter than the others: this one guards credentials.
+			"name": "AUTH_LIMIT",
+			"namespace_id": "1003",
+			"simple": {
+				"limit": 10,
 				"period": 60
 			}
 		}
